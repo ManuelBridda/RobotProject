@@ -22,12 +22,7 @@ per visualizzare e interagire con l'ambiente virtuale
 
 Per avviare il sistema quindi serve lanciare da eclipse
 
-**RobotCleaning/blob/master/src-gen/it/unibo/ctxSensors/MainCtxSensors.java**
-
-**RobotCleaning/src-gen/it/unibo/ctxRobotExplore/MainCtxRobotExplore.java**
-
-
-N.B L'ORDINE DI SALVATAGGIO É IMPORTATANTE! SALVARE SEMPRE PRIMA IL FILE **Robot.qa** E SOLO DOPO **Sensor.qa**
+**RobotCleaning/blob/master/src-gen/it/unibo/ctxSensors/MainCtxRobotCleaner.java**
 
 
  
