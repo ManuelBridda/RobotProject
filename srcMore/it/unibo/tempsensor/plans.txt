@@ -1,0 +1,4 @@
+plan(1,init, sentence(true,move(print("TempSensor STARTED")),'','' ))
+plan(1,emitting, sentence(true,not here StateMoveNormal,'','' ))
+plan(2,emitting, sentence( temp( X),raise( sensorEvent , cmd( temperature,tempmock,X) )'),'','' ))
+plan(3,emitting, sentence(true,delay( 30000) ,'','' ))

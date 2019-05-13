@@ -1,0 +1,3 @@
+plan(1,handleUserCmd, sentence(true,eventswitch(ctrlEvent, »ctrlEvent( on), forward(mind, internalCmdOn,internalCmdOn) ),'','' ))
+plan(2,handleUserCmd, sentence(true,eventswitch(ctrlEvent, »ctrlEvent( off), forward(mind, internalCmdOff,internalCmdOff) ),'','' ))
+plan(3,handleUserCmd, sentence(true,move(resumeplan),'','' ))

@@ -1,0 +1,400 @@
+System robotCleaner
+
+//CONDITIONCONTROL
+Event ctrlEvent : ctrlEvent(VALUE) //GESTITO DA CMDROBOTCONVERTER
+
+//CMDROBOTCONVERTER -> MIND
+Dispatch internalCmdOn : internalCmdOn
+Dispatch internalCmdOff : internalCmdOff
+
+//MIND -> MIND
+Dispatch startExploring : startExploring
+Dispatch endAction : endAction
+Dispatch moveForward : moveForward
+Dispatch endExploring : endExploring
+
+// MIND -> ROBOT
+Dispatch robotCmd : move(DIR, TIME)
+
+//MIND -> LED
+Dispatch ledCmdOn : ledCmdOn 
+Dispatch ledCmdOff : ledCmdOff
+
+//MIND
+Event obstacleEvent : obstacleEvent(TARGET) //GENERATO DA CLIENTTCP
+Event mindEvent : cmd(CATEG, NAME, VALUE) //GESTITO DA EVH
+
+//EVHSONAR SONAR -> MIND
+Event sonarEvent : cmd(CATEG, NAME, VALUE) //GENERATO DA SONARS
+Dispatch sonarCtrl : cmd(CATEG, NAME, VALUE)
+
+//EVH TEMPSENS+CLOCKSENS+MIND -> CONDITIONCONTROL
+Dispatch internalcmd : cmd(CATEG, NAME, VALUE) 
+
+//EVHS2 SONARSSOFF -> SONARS 
+Event sonar : sonar(NAME, PLAYER, DISTANCE) //GENERATO DA SONAR SOFF 
+Dispatch internalsonar : sonar(NAME, PLAYER, DISTANCE)
+
+//TEMPSENS E CLOCKSENS
+Event sensorEvent : cmd(CATEG, NAME, VALUE) //GESTITO DA EVH
+
+//CONSOLE -> CONDITIONCONTROL
+Dispatch usercmd : cmd(CATEG, NAME, VALUE) 
+  
+  
+Context ctxRobotCleaner ip [host="localhost"    port=4448] -g green
+
+EventHandler evhsonar for sonarEvent{  
+	forwardEvent mind -m sonarCtrl   
+	};  
+	
+EventHandler evhs2 for sonar{     
+	forwardEvent sonars -m internalsonar 
+	};   
+
+EventHandler evh for sensorEvent, mindEvent{
+ 	forwardEvent conditioncontrol -m  internalcmd	
+};
+
+QActor console context ctxRobotCleaner{    
+	     
+	Plan init normal[     
+		javaRun it.unibo.utils.clientTcpFrontend.initClientConn("localhost","7777");
+		println("Console STARTED") 
+	]
+	switchTo emitting       
+
+	Plan emitting[ ]
+	
+	transition stopAfter 36000000 
+}           
+ 
+QActor tempsensor context ctxRobotCleaner{           
+	   
+	Plan init normal[  
+		println("TempSensor STARTED")    
+	]
+	switchTo emitting      
+	  
+	Plan emitting[  
+		javaRun it.unibo.utils.getTemperatureFromWeb.getTemperature("44e427eeb51aa6ab57014224fb7e6548");
+		[ !? temp(X)] emit sensorEvent: cmd(temperature, tempmock, X);
+		delay 30000   
+	]  
+	finally repeatPlan
+}
+        
+QActor sonars context ctxRobotCleaner{  
+	  
+	Plan init normal[  
+		println("Sonars STARTED") 
+	]     
+	switchTo waitingForCollision          
+	    
+	Plan waitingForCollision[]
+	
+	transition stopAfter 36000000 
+	whenMsg internalsonar -> handleEvent 
+	finally repeatPlan 
+	     
+	Plan handleEvent resumeLastPlan[ 
+			onMsg  internalsonar : sonar(sonar1, player, 0) -> emit sonarEvent : cmd(sonar1s, sonar1, detectedbysonar1); //controlla nomi poi
+		  	onMsg  internalsonar : sonar(sonar2, player, 0) -> emit sonarEvent : cmd(sonar2s, sonar2, detectedbysonar2)
+	]
+}  
+	  
+QActor clocksensor context ctxRobotCleaner{   
+		
+	Plan init normal[ 
+		println("ClockSensor STARTED")  
+	]
+	switchTo emitting      
+	        
+	Plan emitting[
+		javaOp "it.unibo.custom.getClock.getTime(this)";
+		[ !? clock(X)] emit sensorEvent : cmd(clocktime, clockmock, X);
+		delay 30000   
+	]
+	finally repeatPlan  
+}
+ 
+QActor conditioncontrol context ctxRobotCleaner { 
+  
+	Plan init normal [     
+		demo consult("./resourceModel.pl"); 
+  		println("waiting for msg")
+	] 
+	switchTo init2   
+	  
+	Plan init2[	]
+	
+	transition stopAfter 36000000
+		whenMsg internalcmd -> handleMsg,
+		whenMsg usercmd -> handleMsg 
+	finally repeatPlan  
+	   
+	Plan handleMsg resumeLastPlan[   
+		onMsg internalcmd : cmd(CATEG, NAME, VALUE ) -> demo changeModelItem(CATEG, NAME, VALUE); 
+		onMsg usercmd : cmd(CATEG, NAME, VALUE ) -> demo changeModelItem(CATEG, NAME, VALUE);
+		 
+		onMsg  internalcmd : cmd(temperature, NAME, VALUE ) -> println("Ricevuta temperatura:"); //for test only
+		onMsg  internalcmd : cmd(temperature, NAME, VALUE ) -> println(VALUE); //for test only
+		onMsg  internalcmd : cmd(clocktime, NAME, VALUE ) -> println("Ricevuto orario:"); //for test only
+		onMsg  internalcmd : cmd(clocktime, NAME, VALUE ) -> println(VALUE); //for test only
+		
+		onMsg  internalcmd : cmd(ias, NAME, VALUE ) -> println("Ricevuto evento da Mind/AI:"); //for test only
+		onMsg  internalcmd : cmd(ias, NAME, VALUE ) -> println(VALUE); //for test only
+		
+		onMsg  usercmd : cmd(console, NAME, VALUE ) -> println("Ricevuto comando da console:"); //for test only
+		onMsg  usercmd : cmd(console, NAME, VALUE ) -> println(VALUE); 
+		
+		[ !? model(state(X))] println(X); //for test only //stampa dopo TUTTI eventi sensori.
+		println("---------------")  
+	]	 		 
+}
+ 
+QActor robot context ctxRobotCleaner{ 
+	  
+	Plan init normal[
+		println("Robot STARTED") ;
+		javaRun it.unibo.utils.clientTcp.initClientConn("localhost","8999")
+	]
+	switchTo waitingCmd     
+  
+	Plan waitingCmd[ ]
+
+	transition stopAfter 36000000
+	whenMsg robotCmd -> handleCmd 
+	finally repeatPlan  
+	
+	Plan handleCmd resumeLastPlan[
+		println('[Robot] eseguo mossa:');
+		onMsg robotCmd : move(MOSSA, TIME) -> javaRun it.unibo.utils.clientTcp.sendMsg(MOSSA, TIME);
+		onMsg robotCmd : move(MOSSA, TIME) -> println(MOSSA);
+		onMsg robotCmd : move(MOSSA, TIME) -> println(TIME);
+		println('')
+		] 
+}
+     
+QActor led context ctxRobotCleaner{
+	
+	Plan init normal [
+		javaRun it.unibo.custom.customBlsGui.createCustomLedGui()
+   	]  
+   	switchTo off   
+   	
+   	Plan off [
+   		javaRun it.unibo.custom.customBlsGui.setLed("off")
+   	]
+    transition stopAfter 36000000 
+    	whenMsg ledCmdOff -> off, //serve per consumare eventuali off non consumati in coda
+     	whenMsg ledCmdOn -> ledOn
+    finally repeatPlan	
+    
+     Plan ledOn [
+     		javaRun it.unibo.custom.customBlsGui.setLed("on")
+     ] 
+     transition whenTime 500 -> ledOff 
+    	 whenMsg ledCmdOff -> off
+     
+     Plan ledOff[
+     		javaRun it.unibo.custom.customBlsGui.setLed("off")
+     ]
+     transition whenTime 500 -> ledOn
+     	 whenMsg ledCmdOff -> off   
+}
+		
+QActor cmdrobotconverter context ctxRobotCleaner {
+	 
+ 	Plan init normal [  ] 
+ 	 
+	transition stopAfter 600000
+	whenEvent ctrlEvent -> handleUserCmd 
+	finally repeatPlan      
+	   
+	Plan handleUserCmd resumeLastPlan[	
+		onEvent ctrlEvent : ctrlEvent(on)  -> forward mind -m internalCmdOn : internalCmdOn;
+		onEvent ctrlEvent : ctrlEvent(off) -> forward mind -m internalCmdOff : internalCmdOff
+	]
+}
+
+QActor mind context ctxRobotCleaner{ 
+	  
+	Plan init normal[
+		println("Robot Mind AI (robot autonomous driving) STARTED")  
+		]
+		switchTo statusNotWorking
+		
+	Plan statusNotWorking[
+			println("Status Not Working");
+			javaRun it.unibo.planning.planUtil.initAI();
+			demo retractall(sonar2(X));
+			demo retractall(move(X));
+			demo retractall(moveDone(X));
+			demo retractall(obstacleOnExploringGoal(X));
+			demo retractall(sonar2position(X,Y));
+			demo consult("./robotRules.pl");
+			demo retractall(statusExploring(X));
+			forward led -m ledCmdOff : ledCmdOff
+		]
+		transition stopAfter 3600000
+			whenMsg internalCmdOff -> statusNotWorking,   //clearing Queue
+			whenMsg startExploring -> statusNotWorking,  //clearing Queue
+			whenMsg endAction -> statusNotWorking,  //clearing Queue
+            whenMsg sonarCtrl -> statusNotWorking,  //clearing Queue
+			whenMsg moveForward -> statusNotWorking,  //clearing Queue
+			whenMsg endExploring -> statusNotWorking,  //clearing Queue
+			whenEvent obstacleEvent -> statusNotWorking,  //clearing Queue
+			whenMsg internalCmdOn -> initializingExplore
+		 finally repeatPlan
+		 
+	Plan initializingExplore [
+		forward led -m ledCmdOn : ledCmdOn;  //comunica al led di entrare nello stato di blinking
+		[ !? timeTurn(T) ]forward robot -m robotCmd : move(turnLeft, T); //ruota il robot
+  		delay 500;
+  		[ !? timeTurn(T) ]forward robot -m robotCmd : move(turnLeft, T);  //ruota il robot
+  		delay 500;
+  		demo assign( curNumExplore, 0 ); 
+  		demo assign( nstep,   0) ;	
+  		javaRun it.unibo.planning.planUtil.cleanQa();
+  		selfMsg startExploring : startExploring
+		]
+		transition stopAfter 60000
+			whenMsg internalCmdOff -> statusNotWorking,
+			whenMsg startExploring -> statusExploring
+		finally repeatPlan
+		
+	Plan statusExploring[
+			[ !? curPos(X,Y,D)  ]  println( exploreStep(X,Y,D) );
+			javaRun it.unibo.planning.planUtil.extendSpaceToexplore( );
+ 			[!? inc(curNumExplore,1,E)] javaRun it.unibo.planning.planUtil.setGoal(E,E); 
+			javaRun it.unibo.planning.planUtil.doPlan() ;
+		    [ !? stopExploring] emit mindEvent : cmd(ias, ia1, offobstacle)
+		]
+		transition whenTime 1000 -> doActions
+			whenMsg internalCmdOff -> statusNotWorking
+		finally repeatPlan
+	
+	Plan doActions[ 
+		[ !? move(M) ] println( doActions_doingTheMove(M) );   
+		[ not !? move(M) ] selfMsg endAction : endAction ;
+   		removeRule moveDone(_);     
+   		ReplaceRule moveDuration(_) with  moveDuration(moveWDuration(0));
+     	[ !? doTheMove(a) ]  {  
+ 			[ !? timeTurn(T) ] javaRun it.unibo.utils.movePlanUtil.move("a",T)  	
+ 			}; 
+     	[ !? doTheMove(d) ] {  
+			[ !? timeTurn(T) ] javaRun it.unibo.utils.movePlanUtil.move("d",T)	//move and update map	
+   		} ;
+   		[ !? doTheMove(w) ]{  
+   			 selfMsg moveForward : moveForward
+   			 };
+   			javaRun it.unibo.planning.planUtil.showMap()	
+	]
+		transition whenTime 100 -> doActions  
+			whenMsg internalCmdOff   	-> statusNotWorking ,   //first to be checked
+			whenMsg sonarCtrl 		    -> handleSonar,
+			whenMsg moveForward 		-> handleMoveForward,
+ 	    	whenMsg endAction       	-> backToHome  //all actions done 
+ 	    
+	Plan handleSonar [
+ 	    onMsg sonarCtrl : cmd(sonar2s, sonar2, detectedbysonar2) -> addRule sonar2(reached);
+ 	    onMsg sonarCtrl : cmd(sonar2s, sonar2, detectedbysonar2) ->	{[ !? curPos(X,Y,D)  ] addRule sonar2position(X,Y)};
+ 	    onMsg sonarCtrl : cmd(sonar2s, sonar2, detectedbysonar2) -> println("raggiunto sonar 2")
+ 	    ]
+ 	    transition whenTime 100 -> doActions  
+			whenMsg internalCmdOff     -> statusNotWorking    //first to be checked
+ 
+ //#######################  GESTIONE DELLE MOSSE IN AVANTI CON OSTACOLI	#######################
+ 	Plan handleMoveForward[
+ 	    javaRun it.unibo.utils.movePlanUtil.startTimer();
+ 	    [ !? timew(T) ] forward robot -m robotCmd : move(moveForward, T)
+ 	    ]
+ 	    transition  whenTime 255 -> forwardOk  	//il parametro deve essere lo stesso di timew(XXX) delle rules
+ 	     	whenMsg internalCmdOff     -> statusNotWorking, 
+ 	     	whenEvent obstacleEvent -> handleObstacle
+ 	     	
+ 	Plan forwardOk[
+ 		javaRun it.unibo.planning.planUtil.doMove("w") //update the map
+ 	     	]
+ 	    transition whenTime 100 -> doActions //return to "main"
+ 	     	whenMsg internalCmdOff     -> statusNotWorking,
+ 	     	whenMsg sonarCtrl 		   -> handleSonar //se abbiamo incontrato il sonar avanzando, gestiamo l'informazione prima di tornare 
+ 	     	
+	Plan handleObstacle[
+ 	     forward robot -m robotCmd : move(moveForward, 0);
+ 	     javaRun it.unibo.utils.movePlanUtil.getDuration();
+ 	     selfMsg endAction : endAction    
+ 	     ]
+ 	     switchTo consumePendingCollisions
+ 	     
+ 	Plan consumePendingCollisions[]
+ 	      
+ 	     transition stopAfter  3000
+ 			whenMsg internalCmdOff          -> statusNotWorking ,   //first to be checked
+//    		whenEvent obstacleEvent 		-> consumePendingCollisions,  
+ 			whenMsg endAction     			-> handleCollision
+ 			 
+ 	Plan handleCollision[
+ 		javaRun it.unibo.planning.planUtil.markCellAsObstacle();
+ 		[ ?? moveWDuration(T) ] 	javaRun it.unibo.utils.movePlanUtil.moveNoMap("s",T) ; 
+ 		[ !? explorableDiagonalGoal ]     selfMsg endAction : endAction
+ 		else{ javaRun it.unibo.planning.planUtil.doPlan()
+   	   		}
+ 		] 
+ 		transition whenTime 100 			-> doActions //return to "main"
+ 	     	whenMsg internalCmdOff      -> statusNotWorking,
+ 	     	whenMsg sonarCtrl 		    -> handleSonar, //se abbiamo incontrato il sonar avanzando, gestiamo l'informazione prima di tornare 
+ 	     	whenMsg endAction 			-> backToHome
+ 	     	    
+//#######################  FINE GESTIONE DELLE MOSSE IN AVANTI CON OSTACOLI	#######################	
+	Plan backToHome[ 
+		[ !? sonar2(reached)] { 
+		 	[ !? curPos(0,0,D)  ] {
+ 			  	[ !? sonar2position(X,Y)] {javaRun it.unibo.planning.planUtil.markCellsAsObstacle(X,Y)}
+ 			  	};
+ 			 selfMsg endExploring : endExploring
+ 			 };
+ 			 
+ 		[not !? sonar2(reached)]{
+ 			[ !? curPos(0,0,D)  ]{ 
+ 			 	println(  "AT HOME "	 );		
+ 			 	selfMsg endAction : endAction
+ 			}
+ 			else{
+ 	  			javaRun it.unibo.planning.planUtil.setGoal("0","0");
+	  			[ !? curPos(X,Y,D)  ]  println( backToHome(X,Y,D) );
+	  			javaRun it.unibo.planning.planUtil.doPlan()
+	  		};
+	  		javaRun it.unibo.planning.planUtil.showMap()
+		}
+		]
+		transition whenTime 100 	-> doActions
+			whenMsg internalCmdOff 		-> statusNotWorking,
+ 			whenMsg endAction			-> statusExploring,
+ 			whenMsg endExploring 		-> exploreUncovered
+ 		 
+ 	Plan exploreUncovered[
+ 		[!? noOpGoal(yes)] {
+ 			javaRun it.unibo.planning.planUtil.findNextCellUncovered( );
+ 			[ !? uncovered(X,Y)]{
+ 				removeRule uncovered(X,Y);
+ 				javaRun it.unibo.planning.planUtil.markGoalCellAsObstacle(X,Y);
+ 				removeRule noOpGoal(yes); 
+ 				delay 200
+ 				}
+ 			};
+ 		javaRun it.unibo.planning.planUtil.findNextCellUncovered( );
+ 		[ !? uncovered(X,Y)]{
+ 			removeRule uncovered(X,Y);
+ 			javaRun it.unibo.planning.planUtil.setGoal(X,Y) ;
+ 			javaRun it.unibo.planning.planUtil.doPlan()
+    	    }
+    	else {
+    	    [ !? sonar2position(Z,W)] javaRun it.unibo.planning.planUtil.setGoal(Z,W);
+    	    javaRun it.unibo.planning.planUtil.doPlan() 
+    	    }
+ 		]
+ 		transition whenTime 100 -> doActions
+			whenMsg internalCmdOff -> statusNotWorking
+}

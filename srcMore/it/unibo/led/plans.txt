@@ -1,0 +1,4 @@
+plan(1,init, sentence(true,not here StateMoveNormal,'','' ))
+plan(1,off, sentence(true,not here StateMoveNormal,'','' ))
+plan(1,ledOn, sentence(true,not here StateMoveNormal,'','' ))
+plan(1,ledOff, sentence(true,not here StateMoveNormal,'','' ))

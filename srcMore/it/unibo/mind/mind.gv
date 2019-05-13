@@ -1,0 +1,72 @@
+/*
+*
+* A GraphViz DOT FSM description 
+* Please use a GraphViz visualizer (like http://www.webgraphviz.com)
+*  
+*/
+
+digraph finite_state_machine {
+	rankdir=LR
+	size="8,5"
+	
+	init [ color = red ][ fontcolor = red ][ penwidth = 3 ]
+	backToHome [ color = black ][ fontcolor = black ][ penwidth = 3 ]
+	handleSonar [ color = black ][ fontcolor = black ][ penwidth = 3 ]
+	handleMoveForward [ color = black ][ fontcolor = black ][ penwidth = 3 ]
+	handleCollision [ color = black ][ fontcolor = black ][ penwidth = 3 ]
+	exploreUncovered [ color = black ][ fontcolor = black ][ penwidth = 3 ]
+	statusExploring [ color = black ][ fontcolor = black ][ penwidth = 3 ]
+	doActions [ color = black ][ fontcolor = black ][ penwidth = 3 ]
+	handleObstacle [ color = black ][ fontcolor = black ][ penwidth = 3 ]
+	forwardOk [ color = black ][ fontcolor = black ][ penwidth = 3 ]
+	initializingExplore [ color = black ][ fontcolor = black ][ penwidth = 3 ]
+	statusNotWorking [ color = black ][ fontcolor = black ][ penwidth = 3 ]
+	consumePendingCollisions [ color = black ][ fontcolor = black ][ penwidth = 3 ]
+	
+	statusExploring -> statusExploring [ label = "repeat "][ style = dashed ][ color = blue ][ fontcolor = blue ]
+	consumePendingCollisions -> statusNotWorking [ label = "internalCmdOff" ][ color = black ][ fontcolor = black ]
+	statusExploring -> statusNotWorking [ label = "internalCmdOff" ][ color = black ][ fontcolor = black ]
+	backToHome -> statusNotWorking [ label = "internalCmdOff" ][ color = black ][ fontcolor = black ]
+	handleMoveForward -> statusNotWorking [ label = "internalCmdOff" ][ color = black ][ fontcolor = black ]
+	forwardOk -> handleSonar [ label = "sonarCtrl" ][ color = black ][ fontcolor = black ]
+	statusNotWorking -> statusNotWorking [ label = "internalCmdOff" ][ color = black ][ fontcolor = black ]
+	statusExploring -> doActions [ label = "timeout(1000)" ][ color = green ][ fontcolor = green ]
+	statusNotWorking -> statusNotWorking [ label = "obstacleEvent" ][ color = black ][ fontcolor = black ]
+	statusNotWorking -> statusNotWorking [ label = "repeat "][ style = dashed ][ color = blue ][ fontcolor = blue ]
+	handleCollision -> backToHome [ label = "endAction" ][ color = black ][ fontcolor = black ]
+	statusNotWorking -> statusNotWorking [ label = "sonarCtrl" ][ color = black ][ fontcolor = black ]
+	handleMoveForward -> forwardOk [ label = "timeout(740)" ][ color = green ][ fontcolor = green ]
+	doActions -> doActions [ label = "timeout(1000)" ][ color = green ][ fontcolor = green ]
+	statusNotWorking -> initializingExplore [ label = "internalCmdOn" ][ color = black ][ fontcolor = black ]
+	init -> statusNotWorking [ label = "switch" ][ color = black ][ fontcolor = black ]
+	backToHome -> exploreUncovered [ label = "endExploring" ][ color = black ][ fontcolor = black ]
+	exploreUncovered -> statusNotWorking [ label = "internalCmdOff" ][ color = black ][ fontcolor = black ]
+	forwardOk -> statusNotWorking [ label = "internalCmdOff" ][ color = black ][ fontcolor = black ]
+	consumePendingCollisions -> handleCollision [ label = "endAction" ][ color = black ][ fontcolor = black ]
+	exploreUncovered -> doActions [ label = "timeout(100)" ][ color = green ][ fontcolor = green ]
+	doActions -> handleSonar [ label = "sonarCtrl" ][ color = black ][ fontcolor = black ]
+	consumePendingCollisions -> handleToutBuiltIn [ label = "timeout(3000)" ][ color = green ][ fontcolor = green ]
+	consumePendingCollisions -> consumePendingCollisions [ label = "obstacleEvent" ][ color = black ][ fontcolor = black ]
+	backToHome -> doActions [ label = "timeout(100)" ][ color = green ][ fontcolor = green ]
+	doActions -> backToHome [ label = "endAction" ][ color = black ][ fontcolor = black ]
+	forwardOk -> doActions [ label = "timeout(1000)" ][ color = green ][ fontcolor = green ]
+	initializingExplore -> handleToutBuiltIn [ label = "timeout(60000)" ][ color = green ][ fontcolor = green ]
+	initializingExplore -> statusExploring [ label = "startExploring" ][ color = black ][ fontcolor = black ]
+	backToHome -> statusExploring [ label = "endAction" ][ color = black ][ fontcolor = black ]
+	statusNotWorking -> statusNotWorking [ label = "startExploring" ][ color = black ][ fontcolor = black ]
+	handleCollision -> doActions [ label = "timeout(1000)" ][ color = green ][ fontcolor = green ]
+	handleCollision -> statusNotWorking [ label = "internalCmdOff" ][ color = black ][ fontcolor = black ]
+	statusNotWorking -> handleToutBuiltIn [ label = "timeout(3600000)" ][ color = green ][ fontcolor = green ]
+	statusNotWorking -> statusNotWorking [ label = "endAction" ][ color = black ][ fontcolor = black ]
+	doActions -> statusNotWorking [ label = "internalCmdOff" ][ color = black ][ fontcolor = black ]
+	statusNotWorking -> statusNotWorking [ label = "endExploring" ][ color = black ][ fontcolor = black ]
+	statusNotWorking -> statusNotWorking [ label = "moveForward" ][ color = black ][ fontcolor = black ]
+	initializingExplore -> statusNotWorking [ label = "internalCmdOff" ][ color = black ][ fontcolor = black ]
+	handleMoveForward -> handleObstacle [ label = "obstacleEvent" ][ color = black ][ fontcolor = black ]
+	handleCollision -> handleSonar [ label = "sonarCtrl" ][ color = black ][ fontcolor = black ]
+	doActions -> handleMoveForward [ label = "moveForward" ][ color = black ][ fontcolor = black ]
+	initializingExplore -> initializingExplore [ label = "repeat "][ style = dashed ][ color = blue ][ fontcolor = blue ]
+	handleSonar -> statusNotWorking [ label = "internalCmdOff" ][ color = black ][ fontcolor = black ]
+	handleSonar -> doActions [ label = "timeout(100)" ][ color = green ][ fontcolor = green ]
+	handleObstacle -> consumePendingCollisions [ label = "switch" ][ color = black ][ fontcolor = black ]
+}
