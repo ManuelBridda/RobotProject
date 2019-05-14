@@ -373,6 +373,8 @@ public abstract class AbstractMind extends QActor {
 	    try{	
 	     PlanRepeat pr = PlanRepeat.setUp("consumePendingCollisions",-1);
 	    	String myselfName = "consumePendingCollisions";  
+	    	temporaryStr = "\"CONSUMO COLLISIONE\"";
+	    	println( temporaryStr );  
 	    	//bbb
 	     msgTransition( pr,myselfName,"mind_"+myselfName,false,
 	          new StateFun[]{stateTab.get("statusNotWorking"), stateTab.get("consumePendingCollisions"), stateTab.get("handleCollision") }, 
@@ -392,6 +394,10 @@ public abstract class AbstractMind extends QActor {
 	    	if( (guardVars = QActorUtils.evalTheGuard(this, " ??moveWDuration(T)" )) != null ){
 	    	it.unibo.utils.movePlanUtil.moveNoMap( myself ,"s", guardVars.get("T")  );
 	    	}
+	    	//delay  ( no more reactive within a plan)
+	    	aar = delayReactive(2000,"" , "");
+	    	if( aar.getInterrupted() ) curPlanInExec   = "handleCollision";
+	    	if( ! aar.getGoon() ) return ;
 	    	if( (guardVars = QActorUtils.evalTheGuard(this, " !?explorableDiagonalGoal" )) != null ){
 	    	temporaryStr = QActorUtils.unifyMsgContent(pengine,"endAction","endAction", guardVars ).toString();
 	    	sendMsg("endAction",getNameNoCtrl(), QActorContext.dispatch, temporaryStr ); 

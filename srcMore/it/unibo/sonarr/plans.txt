@@ -1,0 +1,3 @@
+plan(1,init, sentence(true,move(print("sonar(robot) started")),'','' ))
+plan(2,init, sentence(true,not here StateMoveNormal,'','' ))
+plan(1,waitingForCollision, sentence( detected( obstacle),not here StateMoveNormal,'','' ))

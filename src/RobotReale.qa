@@ -156,8 +156,7 @@ QActor conditioncontrol context ctxRobotCleaner {
 QActor robot context ctxRobotCleaner{ 
 	   
 	Plan init normal[
-		println("Robot STARTED") ;
-		javaRun it.unibo.custom.arduino.realRobotAdapter.init("/dev/ttyACM0")
+		println("Robot STARTED")
 	]
 	switchTo waitingCmd     
   
@@ -177,6 +176,24 @@ QActor robot context ctxRobotCleaner{
 		onMsg robotCmd : move(MOSSA, TIME) -> println(TIME);
 		println('') 
 		] 
+}
+
+QActor sonarr context ctxRobotCleaner{
+	Plan init normal[
+		println("sonar(robot) started");
+		javaRun it.unibo.custom.arduino.realRobotAdapter.init("/dev/ttyACM0")
+	]
+	switchTo waitingForCollision
+	 Plan waitingForCollision[
+	 	[ !? detected(obstacle)]{
+	 		emit obstacleEvent : obstacleEvent(detected);
+	 		delay 500;
+	 		demo retractall(detected(_))
+	 		
+	 	}
+	 ]
+	 finally repeatPlan
+	
 }
      
 QActor led context ctxRobotCleaner{
@@ -331,9 +348,9 @@ QActor mind context ctxRobotCleaner{
  	     ]
  	     switchTo consumePendingCollisions
  	     
- 	Plan consumePendingCollisions[]
- 	      
- 	     transition stopAfter  3000
+ 	Plan consumePendingCollisions[println("CONSUMO COLLISIONE")
+ 	]     
+ 	     transition stopAfter 3000
  			whenMsg internalCmdOff          -> statusNotWorking ,   //first to be checked
     		whenEvent obstacleEvent 		-> consumePendingCollisions,  
  			whenMsg endAction     			-> handleCollision
@@ -341,6 +358,7 @@ QActor mind context ctxRobotCleaner{
  	Plan handleCollision[ 
  		javaRun it.unibo.planning.planUtil.markCellAsObstacle();
  		[ ?? moveWDuration(T) ] 	javaRun it.unibo.utils.movePlanUtil.moveNoMap("s",T) ; 
+ 		delay 2000;
  		[ !? explorableDiagonalGoal ]     selfMsg endAction : endAction
  		else{ javaRun it.unibo.planning.planUtil.doPlan()
    	   		}

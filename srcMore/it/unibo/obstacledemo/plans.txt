@@ -1,0 +1,4 @@
+plan(1,init, sentence(true,not here StateMoveNormal,'','' ))
+plan(2,init, sentence(true,move(print("demo STARTED")),'','' ))
+plan(1,handleEvent, sentence(true,printCurrentEvent(false),'','' ))
+plan(2,handleEvent, sentence(true,move(resumeplan),'','' ))

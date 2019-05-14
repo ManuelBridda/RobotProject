@@ -20,7 +20,7 @@ public class realRobotAdapter {
 		getSonarSerialEvents(qa);
 	}
 
-	private static void getSonarSerialEvents(QActor qa) {
+	public static void getSonarSerialEvents(QActor qa) {
 		new Thread() {
 			public void run() { 
 				String msg = null;
@@ -29,15 +29,16 @@ public class realRobotAdapter {
 					try {
 						msg = sp.receiveALine();
 						if(msg.equals("detected\r\n")) {
-							System.out.println("Trovato ostacolo");
-							qa.emit("obstacleEvent","obstacleEvent(detectedObstacle)");
-							//sp.clearQ();
+							System.out.println("Trovato ostacolo [PRE]");
+							//qa.emit("obstacleEvent","obstacleEvent(detectedObstacle)");
+							qa.replaceRule("detected(_)", "detected(obstacle)");
+							System.out.println("Trovato ostacolo [POST]");
 						}
 						
 						}
 					 catch (Exception e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
+						//e.printStackTrace();
 					}
 				}
 
@@ -51,8 +52,8 @@ public class realRobotAdapter {
 	public static void fw(QActor qa, String time) {
 		try {
 			if (sp != null)
-				sp.sendCmd("w");
-				sp.sendCmd(time);
+				sp.sendCmd("w"+time);
+				//sp.sendCmd(time);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -61,8 +62,8 @@ public class realRobotAdapter {
 	public static void bw(QActor qa, String time) {
 		try {
 			if (sp != null)
-				sp.sendCmd("s");
-				sp.sendCmd(time);
+				sp.sendCmd("s"+time);
+				//sp.sendCmd(time);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -71,8 +72,8 @@ public class realRobotAdapter {
 	public static void tl(QActor qa, String time) {
 		try {
 			if (sp != null)
-				sp.sendCmd("a");
-				sp.sendCmd(time);
+				sp.sendCmd("a"+time);
+				//sp.sendCmd(time);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -81,8 +82,8 @@ public class realRobotAdapter {
 	public static void tr(QActor qa, String time) {
 		try {
 			if (sp != null)
-				sp.sendCmd("d");
-				sp.sendCmd(time);
+				sp.sendCmd("d"+time);
+				//sp.sendCmd(time);
 		} catch (Exception e) { 
 			e.printStackTrace();
 		}

@@ -1,5 +1,4 @@
 plan(1,init, sentence(true,move(print("Robot STARTED")),'','' ))
-plan(2,init, sentence(true,not here StateMoveNormal,'','' ))
 plan(1,handleCmd, sentence(true,move(print("[Robot] eseguo mossa:")),'','' ))
 plan(2,handleCmd, sentence(true,msgswitch(robotCmd, move( moveForward,TIME) , not here StateMoveNormal),'','' ))
 plan(3,handleCmd, sentence(true,msgswitch(robotCmd, move( moveBackward,TIME) , not here StateMoveNormal),'','' ))

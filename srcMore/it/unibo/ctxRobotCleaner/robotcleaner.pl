@@ -15,6 +15,8 @@ qactor( conditioncontrol , ctxrobotcleaner, "it.unibo.conditioncontrol.MsgHandle
 qactor( conditioncontrol_ctrl , ctxrobotcleaner, "it.unibo.conditioncontrol.Conditioncontrol"   ). %%control-driven 
 qactor( robot , ctxrobotcleaner, "it.unibo.robot.MsgHandle_Robot"   ). %%store msgs 
 qactor( robot_ctrl , ctxrobotcleaner, "it.unibo.robot.Robot"   ). %%control-driven 
+qactor( sonarr , ctxrobotcleaner, "it.unibo.sonarr.MsgHandle_Sonarr"   ). %%store msgs 
+qactor( sonarr_ctrl , ctxrobotcleaner, "it.unibo.sonarr.Sonarr"   ). %%control-driven 
 qactor( led , ctxrobotcleaner, "it.unibo.led.MsgHandle_Led"   ). %%store msgs 
 qactor( led_ctrl , ctxrobotcleaner, "it.unibo.led.Led"   ). %%control-driven 
 qactor( cmdrobotconverter , ctxrobotcleaner, "it.unibo.cmdrobotconverter.MsgHandle_Cmdrobotconverter"   ). %%store msgs 

@@ -1,0 +1,24 @@
+System demoObstacle
+
+Event obstacleEvent : obstacleEvent(TARGET)
+
+Context ctxDemoObstacle ip [host="localhost"    port=5558] -g green
+
+QActor obstacledemo context ctxDemoObstacle{  
+	  
+	Plan init normal[  
+		javaRun it.unibo.custom.arduino.realRobotAdapter.init("COM3");
+		println("demo STARTED") 
+	]     
+	switchTo waitingForCollision          
+	    
+	Plan waitingForCollision[]
+	
+	transition stopAfter 36000000 
+	whenEvent obstacleEvent -> handleEvent 
+	finally repeatPlan 
+	     
+	Plan handleEvent resumeLastPlan[ 
+		  	printCurrentEvent
+	]
+}  

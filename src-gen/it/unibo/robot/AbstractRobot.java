@@ -77,7 +77,6 @@ public abstract class AbstractRobot extends QActor {
 	    	String myselfName = "init";  
 	    	temporaryStr = "\"Robot STARTED\"";
 	    	println( temporaryStr );  
-	    	it.unibo.custom.arduino.realRobotAdapter.init( myself ,"/dev/ttyACM0"  );
 	    	//switchTo waitingCmd
 	        switchToPlanAsNextState(pr, myselfName, "robot_"+myselfName, 
 	              "waitingCmd",false, false, null); 
