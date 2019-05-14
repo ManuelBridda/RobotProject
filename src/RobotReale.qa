@@ -187,7 +187,7 @@ QActor sonarr context ctxRobotCleaner{
 	 Plan waitingForCollision[
 	 	[ !? detected(obstacle)]{
 	 		emit obstacleEvent : obstacleEvent(detected);
-	 		delay 500;
+	 		delay 2000;
 	 		demo retractall(detected(_))
 	 		
 	 	}

@@ -96,7 +96,7 @@ public abstract class AbstractSonarr extends QActor {
 	    	temporaryStr = QActorUtils.unifyMsgContent(pengine, "obstacleEvent(TARGET)","obstacleEvent(detected)", guardVars ).toString();
 	    	emit( "obstacleEvent", temporaryStr );
 	    	//delay  ( no more reactive within a plan)
-	    	aar = delayReactive(500,"" , "");
+	    	aar = delayReactive(2000,"" , "");
 	    	if( aar.getInterrupted() ) curPlanInExec   = "waitingForCollision";
 	    	if( ! aar.getGoon() ) return ;
 	    	parg = "retractall(detected(_))";
