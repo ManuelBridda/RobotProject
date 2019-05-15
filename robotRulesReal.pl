@@ -1,6 +1,6 @@
 
-	timew(255).  
-	timeTurn(300).	
+	timew(740).  
+	timeTurn(345).	
 	curGoal(0,0).   
  	
 %%eval( le, X, X ) :- !. 

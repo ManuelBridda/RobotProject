@@ -253,7 +253,7 @@ QActor mind context ctxRobotCleaner{
 			demo retractall(moveDone(X));
 			demo retractall(obstacleOnExploringGoal(X));
 			demo retractall(sonar2position(X,Y));
-			demo consult("./robotRules.pl");
+			demo consult("./robotRulesReal.pl");
 			demo retractall(statusExploring(X));
 			forward led -m ledCmdOff : ledCmdOff
 		]
