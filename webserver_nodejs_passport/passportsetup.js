@@ -14,7 +14,6 @@ passport.use(new LocalStrategy(
 ));
 
 
-//check if these two are good...
 passport.serializeUser(function(user, done) {
   done(null, user);
 });
