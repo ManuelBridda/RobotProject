@@ -77,6 +77,7 @@ public abstract class AbstractRobot extends QActor {
 	    	String myselfName = "init";  
 	    	temporaryStr = "\"Robot STARTED\"";
 	    	println( temporaryStr );  
+	    	it.unibo.utils.clientTcp.initClientConn( myself ,"localhost", "8999"  );
 	    	//switchTo waitingCmd
 	        switchToPlanAsNextState(pr, myselfName, "robot_"+myselfName, 
 	              "waitingCmd",false, false, null); 
@@ -110,58 +111,20 @@ public abstract class AbstractRobot extends QActor {
 	    	println( temporaryStr );  
 	    	//onMsg 
 	    	setCurrentMsgFromStore(); 
-	    	curT = Term.createTerm("move(moveForward,TIME)");
+	    	curT = Term.createTerm("move(MOSSA,TIME)");
 	    	if( currentMessage != null && currentMessage.msgId().equals("robotCmd") && 
 	    		pengine.unify(curT, Term.createTerm("move(DIR,TIME)")) && 
 	    		pengine.unify(curT, Term.createTerm( currentMessage.msgContent() ) )){ 
 	    		{/* JavaLikeMove */ 
-	    		String arg1 = "TIME" ;
-	    		arg1 =  updateVars( Term.createTerm("move(DIR,TIME)"), Term.createTerm("move(moveForward,TIME)"), 
+	    		String arg1 = "MOSSA" ;
+	    		arg1 =  updateVars( Term.createTerm("move(DIR,TIME)"), Term.createTerm("move(MOSSA,TIME)"), 
 	    			                Term.createTerm(currentMessage.msgContent()),  arg1 );	                
 	    		//end arg1
-	    		it.unibo.custom.arduino.realRobotAdapter.fw(this,arg1 );
-	    		}
-	    	}
-	    	//onMsg 
-	    	setCurrentMsgFromStore(); 
-	    	curT = Term.createTerm("move(moveBackward,TIME)");
-	    	if( currentMessage != null && currentMessage.msgId().equals("robotCmd") && 
-	    		pengine.unify(curT, Term.createTerm("move(DIR,TIME)")) && 
-	    		pengine.unify(curT, Term.createTerm( currentMessage.msgContent() ) )){ 
-	    		{/* JavaLikeMove */ 
-	    		String arg1 = "TIME" ;
-	    		arg1 =  updateVars( Term.createTerm("move(DIR,TIME)"), Term.createTerm("move(moveBackward,TIME)"), 
-	    			                Term.createTerm(currentMessage.msgContent()),  arg1 );	                
-	    		//end arg1
-	    		it.unibo.custom.arduino.realRobotAdapter.bw(this,arg1 );
-	    		}
-	    	}
-	    	//onMsg 
-	    	setCurrentMsgFromStore(); 
-	    	curT = Term.createTerm("move(turnLeft,TIME)");
-	    	if( currentMessage != null && currentMessage.msgId().equals("robotCmd") && 
-	    		pengine.unify(curT, Term.createTerm("move(DIR,TIME)")) && 
-	    		pengine.unify(curT, Term.createTerm( currentMessage.msgContent() ) )){ 
-	    		{/* JavaLikeMove */ 
-	    		String arg1 = "TIME" ;
-	    		arg1 =  updateVars( Term.createTerm("move(DIR,TIME)"), Term.createTerm("move(turnLeft,TIME)"), 
-	    			                Term.createTerm(currentMessage.msgContent()),  arg1 );	                
-	    		//end arg1
-	    		it.unibo.custom.arduino.realRobotAdapter.tl(this,arg1 );
-	    		}
-	    	}
-	    	//onMsg 
-	    	setCurrentMsgFromStore(); 
-	    	curT = Term.createTerm("move(turnRight,TIME)");
-	    	if( currentMessage != null && currentMessage.msgId().equals("robotCmd") && 
-	    		pengine.unify(curT, Term.createTerm("move(DIR,TIME)")) && 
-	    		pengine.unify(curT, Term.createTerm( currentMessage.msgContent() ) )){ 
-	    		{/* JavaLikeMove */ 
-	    		String arg1 = "TIME" ;
-	    		arg1 =  updateVars( Term.createTerm("move(DIR,TIME)"), Term.createTerm("move(turnRight,TIME)"), 
-	    			                Term.createTerm(currentMessage.msgContent()),  arg1 );	                
-	    		//end arg1
-	    		it.unibo.custom.arduino.realRobotAdapter.tr(this,arg1 );
+	    		String arg2 = "TIME" ;
+	    		arg2 =  updateVars( Term.createTerm("move(DIR,TIME)"), Term.createTerm("move(MOSSA,TIME)"), 
+	    			                Term.createTerm(currentMessage.msgContent()),  arg2 );	                
+	    		//end arg2
+	    		it.unibo.utils.clientTcp.sendMsg(this,arg1,arg2 );
 	    		}
 	    	}
 	    	//onMsg 

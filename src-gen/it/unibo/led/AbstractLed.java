@@ -76,7 +76,7 @@ public abstract class AbstractLed extends QActor {
 	    try{	
 	     PlanRepeat pr = PlanRepeat.setUp("init",-1);
 	    	String myselfName = "init";  
-	    	it.unibo.custom.raspberry.raspLed.init( myself  );
+	    	it.unibo.custom.hue.hueClient.init( myself  );
 	    	//switchTo off
 	        switchToPlanAsNextState(pr, myselfName, "led_"+myselfName, 
 	              "off",false, false, null); 
@@ -91,7 +91,7 @@ public abstract class AbstractLed extends QActor {
 	     PlanRepeat pr = PlanRepeat.setUp(getName()+"_off",0);
 	     pr.incNumIter(); 	
 	    	String myselfName = "off";  
-	    	it.unibo.custom.raspberry.raspLed.setOff( myself  );
+	    	it.unibo.custom.hue.hueClient.off( myself  );
 	    	//bbb
 	     msgTransition( pr,myselfName,"led_"+myselfName,false,
 	          new StateFun[]{stateTab.get("off"), stateTab.get("ledOn") }, 
@@ -107,7 +107,7 @@ public abstract class AbstractLed extends QActor {
 	    try{	
 	     PlanRepeat pr = PlanRepeat.setUp("ledOn",-1);
 	    	String myselfName = "ledOn";  
-	    	it.unibo.custom.raspberry.raspLed.setOn( myself  );
+	    	it.unibo.custom.hue.hueClient.on( myself  );
 	    	//bbb
 	     msgTransition( pr,myselfName,"led_"+myselfName,false,
 	          new StateFun[]{stateTab.get("off") }, 
@@ -123,7 +123,7 @@ public abstract class AbstractLed extends QActor {
 	    try{	
 	     PlanRepeat pr = PlanRepeat.setUp("ledOff",-1);
 	    	String myselfName = "ledOff";  
-	    	it.unibo.custom.raspberry.raspLed.setOff( myself  );
+	    	it.unibo.custom.hue.hueClient.off( myself  );
 	    	//bbb
 	     msgTransition( pr,myselfName,"led_"+myselfName,false,
 	          new StateFun[]{stateTab.get("off") }, 

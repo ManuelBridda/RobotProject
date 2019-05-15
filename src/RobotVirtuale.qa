@@ -179,12 +179,12 @@ QActor robot context ctxRobotCleaner{
 QActor led context ctxRobotCleaner{
 	
 	Plan init normal [
-		javaRun it.unibo.custom.customBlsGui.createCustomLedGui()
+		javaRun it.unibo.custom.hue.hueClient.init()
    	]  
    	switchTo off   
    	
    	Plan off [
-   		javaRun it.unibo.custom.customBlsGui.setLed("off")
+   		javaRun it.unibo.custom.hue.hueClient.off()
    	]
     transition stopAfter 36000000 
     	whenMsg ledCmdOff -> off, //serve per consumare eventuali off non consumati in coda
@@ -192,13 +192,13 @@ QActor led context ctxRobotCleaner{
     finally repeatPlan	
     
      Plan ledOn [
-     		javaRun it.unibo.custom.customBlsGui.setLed("on")
+     		javaRun it.unibo.custom.hue.hueClient.on()
      ] 
      transition whenTime 500 -> ledOff 
     	 whenMsg ledCmdOff -> off
      
      Plan ledOff[
-     		javaRun it.unibo.custom.customBlsGui.setLed("off")
+     		javaRun it.unibo.custom.hue.hueClient.off()
      ]
      transition whenTime 500 -> ledOn
      	 whenMsg ledCmdOff -> off   

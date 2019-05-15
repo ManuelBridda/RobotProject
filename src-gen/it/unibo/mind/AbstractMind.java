@@ -253,7 +253,7 @@ public abstract class AbstractMind extends QActor {
 	     msgTransition( pr,myselfName,"mind_"+myselfName,false,
 	          new StateFun[]{stateTab.get("statusNotWorking"), stateTab.get("handleSonar"), stateTab.get("handleMoveForward"), stateTab.get("backToHome") }, 
 	          new String[]{"true","M","internalCmdOff", "true","M","sonarCtrl", "true","M","moveForward", "true","M","endAction" },
-	          1000, "doActions" );//msgTransition
+	          100, "doActions" );//msgTransition
 	    }catch(Exception e_doActions){  
 	    	 println( getName() + " plan=doActions WARNING:" + e_doActions.getMessage() );
 	    	 QActorContext.terminateQActorSystem(this); 
@@ -328,7 +328,7 @@ public abstract class AbstractMind extends QActor {
 	     msgTransition( pr,myselfName,"mind_"+myselfName,false,
 	          new StateFun[]{stateTab.get("statusNotWorking"), stateTab.get("handleObstacle") }, 
 	          new String[]{"true","M","internalCmdOff", "true","E","obstacleEvent" },
-	          740, "forwardOk" );//msgTransition
+	          255, "forwardOk" );//msgTransition
 	    }catch(Exception e_handleMoveForward){  
 	    	 println( getName() + " plan=handleMoveForward WARNING:" + e_handleMoveForward.getMessage() );
 	    	 QActorContext.terminateQActorSystem(this); 
@@ -344,7 +344,7 @@ public abstract class AbstractMind extends QActor {
 	     msgTransition( pr,myselfName,"mind_"+myselfName,false,
 	          new StateFun[]{stateTab.get("statusNotWorking"), stateTab.get("handleSonar") }, 
 	          new String[]{"true","M","internalCmdOff", "true","M","sonarCtrl" },
-	          1000, "doActions" );//msgTransition
+	          100, "doActions" );//msgTransition
 	    }catch(Exception e_forwardOk){  
 	    	 println( getName() + " plan=forwardOk WARNING:" + e_forwardOk.getMessage() );
 	    	 QActorContext.terminateQActorSystem(this); 
@@ -373,12 +373,10 @@ public abstract class AbstractMind extends QActor {
 	    try{	
 	     PlanRepeat pr = PlanRepeat.setUp("consumePendingCollisions",-1);
 	    	String myselfName = "consumePendingCollisions";  
-	    	temporaryStr = "\"CONSUMO COLLISIONE\"";
-	    	println( temporaryStr );  
 	    	//bbb
 	     msgTransition( pr,myselfName,"mind_"+myselfName,false,
-	          new StateFun[]{stateTab.get("statusNotWorking"), stateTab.get("consumePendingCollisions"), stateTab.get("handleCollision") }, 
-	          new String[]{"true","M","internalCmdOff", "true","E","obstacleEvent", "true","M","endAction" },
+	          new StateFun[]{stateTab.get("statusNotWorking"), stateTab.get("handleCollision") }, 
+	          new String[]{"true","M","internalCmdOff", "true","M","endAction" },
 	          3000, "handleToutBuiltIn" );//msgTransition
 	    }catch(Exception e_consumePendingCollisions){  
 	    	 println( getName() + " plan=consumePendingCollisions WARNING:" + e_consumePendingCollisions.getMessage() );
@@ -394,10 +392,6 @@ public abstract class AbstractMind extends QActor {
 	    	if( (guardVars = QActorUtils.evalTheGuard(this, " ??moveWDuration(T)" )) != null ){
 	    	it.unibo.utils.movePlanUtil.moveNoMap( myself ,"s", guardVars.get("T")  );
 	    	}
-	    	//delay  ( no more reactive within a plan)
-	    	aar = delayReactive(2000,"" , "");
-	    	if( aar.getInterrupted() ) curPlanInExec   = "handleCollision";
-	    	if( ! aar.getGoon() ) return ;
 	    	if( (guardVars = QActorUtils.evalTheGuard(this, " !?explorableDiagonalGoal" )) != null ){
 	    	temporaryStr = QActorUtils.unifyMsgContent(pengine,"endAction","endAction", guardVars ).toString();
 	    	sendMsg("endAction",getNameNoCtrl(), QActorContext.dispatch, temporaryStr ); 
@@ -410,7 +404,7 @@ public abstract class AbstractMind extends QActor {
 	     msgTransition( pr,myselfName,"mind_"+myselfName,false,
 	          new StateFun[]{stateTab.get("statusNotWorking"), stateTab.get("handleSonar"), stateTab.get("backToHome") }, 
 	          new String[]{"true","M","internalCmdOff", "true","M","sonarCtrl", "true","M","endAction" },
-	          1000, "doActions" );//msgTransition
+	          100, "doActions" );//msgTransition
 	    }catch(Exception e_handleCollision){  
 	    	 println( getName() + " plan=handleCollision WARNING:" + e_handleCollision.getMessage() );
 	    	 QActorContext.terminateQActorSystem(this); 
