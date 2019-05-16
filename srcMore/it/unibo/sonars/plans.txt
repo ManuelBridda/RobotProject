@@ -1,4 +1,3 @@
 plan(1,init, sentence(true,move(print("Sonars STARTED")),'','' ))
-plan(1,handleEvent, sentence(true,msgswitch(internalsonar, sonar( sonar1,player,0) , raise( sonarEvent , cmd( sonar1s,sonar1,detectedbysonar1) )')),'','' ))
-plan(2,handleEvent, sentence(true,msgswitch(internalsonar, sonar( sonar2,player,0) , raise( sonarEvent , cmd( sonar2s,sonar2,detectedbysonar2) )')),'','' ))
-plan(3,handleEvent, sentence(true,move(resumeplan),'','' ))
+plan(1,handleEvent, sentence(true,msgswitch(internalsonar, sonar( sonar2,player,0) , raise( sonarEvent , cmd( sonar2s,sonar2,detectedbysonar2) )')),'','' ))
+plan(2,handleEvent, sentence(true,move(resumeplan),'','' ))

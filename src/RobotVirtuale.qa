@@ -98,7 +98,7 @@ QActor sonars context ctxRobotCleaner{
 	finally repeatPlan 
 	     
 	Plan handleEvent resumeLastPlan[ 
-			onMsg  internalsonar : sonar(sonar1, player, 0) -> emit sonarEvent : cmd(sonar1s, sonar1, detectedbysonar1); //controlla nomi poi
+			//onMsg  internalsonar : sonar(sonar1, player, 0) -> emit sonarEvent : cmd(sonar1s, sonar1, detectedbysonar1); //controlla nomi poi
 		  	onMsg  internalsonar : sonar(sonar2, player, 0) -> emit sonarEvent : cmd(sonar2s, sonar2, detectedbysonar2)
 	]
 }  

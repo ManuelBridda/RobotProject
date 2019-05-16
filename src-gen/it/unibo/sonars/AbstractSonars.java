@@ -108,18 +108,6 @@ public abstract class AbstractSonars extends QActor {
 	    	String myselfName = "handleEvent";  
 	    	//onMsg 
 	    	setCurrentMsgFromStore(); 
-	    	curT = Term.createTerm("sonar(sonar1,player,0)");
-	    	if( currentMessage != null && currentMessage.msgId().equals("internalsonar") && 
-	    		pengine.unify(curT, Term.createTerm("sonar(NAME,PLAYER,DISTANCE)")) && 
-	    		pengine.unify(curT, Term.createTerm( currentMessage.msgContent() ) )){ 
-	    		String parg="cmd(sonar1s,sonar1,detectedbysonar1)";
-	    		/* RaiseEvent */
-	    		parg = updateVars(Term.createTerm("sonar(NAME,PLAYER,DISTANCE)"),  Term.createTerm("sonar(sonar1,player,0)"), 
-	    			    		  					Term.createTerm(currentMessage.msgContent()), parg);
-	    		if( parg != null ) emit( "sonarEvent", parg );
-	    	}
-	    	//onMsg 
-	    	setCurrentMsgFromStore(); 
 	    	curT = Term.createTerm("sonar(sonar2,player,0)");
 	    	if( currentMessage != null && currentMessage.msgId().equals("internalsonar") && 
 	    		pengine.unify(curT, Term.createTerm("sonar(NAME,PLAYER,DISTANCE)")) && 
